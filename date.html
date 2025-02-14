@@ -1,0 +1,324 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Date for Kasia 💕</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Greeting Scene -->
+    <div id="greeting">
+      <h1>Hi Kasia, it's Sunny!</h1>
+      <p>Happy Valentine's Day, my love! Today, let's enjoy a special date together. Would you like to take a walk in the park or watch a movie with me?</p>
+      <button onclick="startScene('park')">Let's go to the park 🌳</button>
+      <button onclick="startScene('movie')">Let's watch a movie 🎬</button>
+    </div>
+
+    <!-- Park Scene -->
+    <div id="parkScene" class="hidden">
+      <h2>We Take a Beautiful Walk in the Park</h2>
+      <p>The sun is shining and the birds are singing. Every step with you makes my heart flutter.</p>
+      <div id="complimentDisplay"></div>
+      <button id="complimentButton" onclick="showNextCompliment('park')">Continue</button>
+      <button id="nextButton" onclick="nextScene()" style="display:none;">Next ➡️</button>
+    </div>
+
+    <!-- Movie Scene -->
+    <div id="movieScene" class="hidden">
+      <h2>We are watching a very sweet romantic movie</h2>
+      <p>Snuggling up with you makes every movie a blockbuster. I can't take my eyes off you.</p>
+      <div id="complimentDisplayMovie"></div>
+      <button id="complimentButtonMovie" onclick="showNextCompliment('movie')">Continue</button>
+      <button id="nextButtonMovie" onclick="nextScene()" style="display:none;">Next ➡️</button>
+    </div>
+
+    <!-- Night Scene -->
+    <div id="nightScene" class="hidden">
+      <h2>The Night is Young...</h2>
+      <p>It's getting late... Want to come with me to the bedroom, baby? 😏</p>
+      <button onclick="goToBedroom()">Yes, let's go 😘</button>
+      <button onclick="goodnight()">Let's save it for marriage 😊</button>
+    </div>
+
+    <!-- Goodnight Scene -->
+    <div id="goodnightScene" class="hidden">
+      <h2>Goodnight, My Love</h2>
+      <p>Sleep well, Kasia. Dream of our wonderful moments together. 💕</p>
+      <button onclick="restart()">Restart</button>
+    </div>
+  </div>
+
+  <!-- Door Animation Container (for bedroom scene) -->
+  <div id="doorContainer" class="hidden">
+    <div id="leftDoor"></div>
+    <div id="rightDoor"></div>
+  </div>
+
+  <!-- Emoji Container (for random 💋 emojis after door closes) -->
+  <div id="emojiContainer" class="hidden">
+    <!-- Randomly spawned 💋 emojis will appear here -->
+    <button id="restartButton" onclick="restart()">Restart</button>
+  </div>
+
+  <!-- Audio Elements for Sound Effects -->
+  <audio id="clickSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <audio id="doorSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <audio id="kissSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html><style>/* Base Styling */
+body {
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  background-color: #fff0f5; /* Light pink background */
+  color: #333;
+  padding: 20px;
+  margin: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Button Styling */
+button {
+  background-color: #ff69b4;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 10px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #ff1493;
+}
+
+/* Hidden Elements */
+.hidden {
+  display: none;
+}
+
+/* Fade-In Animation */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Night Scene Styling (black text with light white shadow for readability) */
+#nightScene {
+  background: url('https://i.ibb.co/Kc6DfYdz/love-973128-1280.jpg') no-repeat center center/cover;
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  text-shadow: 1px 1px 2px #fff;
+}
+
+/* Door Animation Styles */
+#doorContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+#leftDoor, #rightDoor {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: #333;
+}
+
+#leftDoor {
+  left: -50%;
+  animation: leftDoorClose 2s forwards;
+}
+
+#rightDoor {
+  right: -50%;
+  animation: rightDoorClose 2s forwards;
+}
+
+@keyframes leftDoorClose {
+  0% { left: -50%; }
+  100% { left: 0; }
+}
+
+@keyframes rightDoorClose {
+  0% { right: -50%; }
+  100% { right: 0; }
+}
+
+/* Emoji Container Styling */
+#emojiContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://i.ibb.co/HDc4Rt8/night-sky.jpg') no-repeat center center/cover;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+/* Randomly spawned emojis with a 0.8s fade-in animation */
+.random-emoji {
+  position: absolute;
+  font-size: 40px;
+  opacity: 0;
+  animation: fadeInOne 0.8s forwards;
+}
+
+@keyframes fadeInOne {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Restart Button Styling in Emoji Container */
+#restartButton {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff1493;
+  padding: 15px 25px;
+  font-size: 18px;
+  border-radius: 10px;
+  z-index: 2000;
+}</style><script>// Utility function to play a sound effect by element ID
+function playSound(id) {
+  const sound = document.getElementById(id);
+  if (sound) {
+    sound.currentTime = 0;
+    sound.play();
+  }
+}
+
+// Global arrays for compliments
+let parkCompliments = [
+  "Kasia, your smile lights up the park like the morning sun!",
+  "Every moment with you feels like a beautiful dream.",
+  "Walking beside you makes everything perfect."
+];
+let parkIndex = 0;
+
+let movieCompliments = [
+  "Your laughter is the best part of any movie night.",
+  "Every scene is better because you're here with me.",
+  "I could watch you for hours; you're my favorite movie."
+];
+let movieIndex = 0;
+
+// Start either the park or movie scene from the greeting
+function startScene(scene) {
+  playSound("clickSound");
+  document.getElementById("greeting").classList.add("hidden");
+  if (scene === "park") {
+    document.getElementById("parkScene").classList.remove("hidden");
+  } else if (scene === "movie") {
+    document.getElementById("movieScene").classList.remove("hidden");
+  }
+}
+
+// Show compliments one by one in the park or movie scene
+function showNextCompliment(scene) {
+  playSound("clickSound");
+  if (scene === "park") {
+    if (parkIndex < parkCompliments.length) {
+      const display = document.getElementById("complimentDisplay");
+      const p = document.createElement("p");
+      p.innerText = parkCompliments[parkIndex];
+      p.classList.add("fade-in");
+      display.appendChild(p);
+      parkIndex++;
+      if (parkIndex === parkCompliments.length) {
+        document.getElementById("complimentButton").style.display = "none";
+        document.getElementById("nextButton").style.display = "inline-block";
+      }
+    }
+  } else if (scene === "movie") {
+    if (movieIndex < movieCompliments.length) {
+      const display = document.getElementById("complimentDisplayMovie");
+      const p = document.createElement("p");
+      p.innerText = movieCompliments[movieIndex];
+      p.classList.add("fade-in");
+      display.appendChild(p);
+      movieIndex++;
+      if (movieIndex === movieCompliments.length) {
+        document.getElementById("complimentButtonMovie").style.display = "none";
+        document.getElementById("nextButtonMovie").style.display = "inline-block";
+      }
+    }
+  }
+}
+
+// Proceed to the night scene after compliments
+function nextScene() {
+  playSound("clickSound");
+  document.getElementById("parkScene").classList.add("hidden");
+  document.getElementById("movieScene").classList.add("hidden");
+  document.getElementById("nightScene").classList.remove("hidden");
+}
+
+// Initiate the bedroom sequence with door closing and then spawn kissing emojis one by one
+function goToBedroom() {
+  playSound("doorSound");
+  document.getElementById("nightScene").classList.add("hidden");
+  document.getElementById("doorContainer").classList.remove("hidden");
+  setTimeout(function() {
+    document.getElementById("doorContainer").classList.add("hidden");
+    playSound("kissSound");
+    document.getElementById("emojiContainer").classList.remove("hidden");
+    spawnRandomEmojis();
+  }, 2200);
+}
+
+// Spawn 30 💋 emojis one by one with a 0.8 sec delay and fade-in animation
+function spawnRandomEmojis() {
+  const container = document.getElementById("emojiContainer");
+  container.querySelectorAll('.random-emoji').forEach(el => el.remove());
+  const totalEmojis = 30;
+  for (let i = 0; i < totalEmojis; i++) {
+    setTimeout(() => {
+      const emoji = document.createElement("p");
+      emoji.classList.add("random-emoji");
+      emoji.innerText = "💋";
+      emoji.style.left = Math.random() * 100 + "%";
+      emoji.style.top = Math.random() * 100 + "%";
+      container.appendChild(emoji);
+    }, i * 800);
+  }
+}
+
+// Alternative ending: Goodnight scene
+function goodnight() {
+  playSound("clickSound");
+  document.getElementById("nightScene").classList.add("hidden");
+  document.getElementById("goodnightScene").classList.remove("hidden");
+}
+
+// Restart the website completely (reloads the page)
+function restart() {
+  playSound("clickSound");
+  location.reload();
+}</script>
